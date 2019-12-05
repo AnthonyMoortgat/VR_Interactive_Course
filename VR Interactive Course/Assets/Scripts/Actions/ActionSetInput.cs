@@ -9,33 +9,75 @@ public class ActionSetInput : MonoBehaviour
     public SteamVR_Action_Boolean menuLeft;
     public SteamVR_Action_Boolean menuRight;
 
+    public GameObject sollarPanel;
+    public GameObject battery;
+    public GameObject menu;
+
+    private ArrayList listModels = new ArrayList();
+    private GameObject activeModel;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        //Instantiate Models
+        GameObject mySolarPannel = Instantiate(sollarPanel);
+        mySolarPannel.transform.parent = menu.transform;
+
+        GameObject myBattery = Instantiate(battery);
+        myBattery.transform.parent = menu.transform;
+        myBattery.SetActive(false);
+
+        listModels.Add(mySolarPannel);
+        listModels.Add(myBattery);
+
+        activeModel = mySolarPannel;
+
+        //Add listner
+        menuLeft.AddOnStateDownListener(GetMenuLeft, handType);
+        menuRight.AddOnStateDownListener(GetMenuRight, handType);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (GetMenuLeft())
-        {
-            print("Menu Left " + handType);
-        }
 
-        if (GetMenuRight())
-        {
-            print("Menu Right " + handType);
-        }
     }
 
-    public bool GetMenuLeft()
+    public void GetMenuLeft(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        return menuLeft.GetState(handType);
+        Debug.Log("Dpad left is down");
+
+        int index = listModels.IndexOf(activeModel);
+        GameObject shownModel = (GameObject)listModels[index];
+        shownModel.SetActive(false);
+        if (index == 0)
+        {
+            shownModel = (GameObject)listModels[listModels.Count - 1];
+            shownModel.SetActive(true);
+        } else {
+            shownModel = (GameObject)listModels[index - 1];
+            shownModel.SetActive(true);
+        }
+
+        activeModel = shownModel;
     }
 
-    public bool GetMenuRight()
+    public void GetMenuRight(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        return menuRight.GetState(handType);
+        Debug.Log("Dpad right is down");
+
+        int index = listModels.IndexOf(activeModel);
+        GameObject shownModel = (GameObject)listModels[index];
+        shownModel.SetActive(false);
+        if (index == listModels.Count - 1)
+        {
+            shownModel = (GameObject)listModels[0];
+            shownModel.SetActive(true);
+        } else {
+            shownModel = (GameObject)listModels[index + 1];
+            shownModel.SetActive(true);
+        }
+
+        activeModel = shownModel;
     }
 }
