@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 
-public class ActionSetInput : MonoBehaviour
+public class RightControllerActions : MonoBehaviour
 {
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Boolean menuLeft;
     public SteamVR_Action_Boolean menuRight;
-    public SteamVR_Action_Boolean grabAction;
 
     public GameObject sollarPanel;
     public GameObject battery;
@@ -41,7 +40,7 @@ public class ActionSetInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     public void GetMenuLeft(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
@@ -55,7 +54,9 @@ public class ActionSetInput : MonoBehaviour
         {
             shownModel = (GameObject)listModels[listModels.Count - 1];
             shownModel.SetActive(true);
-        } else {
+        }
+        else
+        {
             shownModel = (GameObject)listModels[index - 1];
             shownModel.SetActive(true);
         }
@@ -74,22 +75,13 @@ public class ActionSetInput : MonoBehaviour
         {
             shownModel = (GameObject)listModels[0];
             shownModel.SetActive(true);
-        } else {
+        }
+        else
+        {
             shownModel = (GameObject)listModels[index + 1];
             shownModel.SetActive(true);
         }
 
         activeModel = shownModel;
-    }
-
-    public void GrabObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
-    {
-        Debug.Log("Grip is down");
-
-    }
-
-    public void LoseObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
-    {
-        Debug.Log("Grip is up");
     }
 }
