@@ -28,8 +28,6 @@ public class LeftControllerActions : MonoBehaviour
 
     public void GrabObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        Debug.Log("Grip is down");
-
         if (collidingObject)
         {
             objectInHand = collidingObject;
@@ -56,8 +54,6 @@ public class LeftControllerActions : MonoBehaviour
 
     public void LoseObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        Debug.Log("Grip is up");
-
         if (objectInHand)
         {
 

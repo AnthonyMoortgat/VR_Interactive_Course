@@ -13,8 +13,11 @@ public class RightControllerActions : MonoBehaviour
     public GameObject battery;
     public GameObject menu;
 
-    private ArrayList listModels = new ArrayList();
+    // private ArrayList listModels = new ArrayList();
+    private List<GameObject> listModels = new List<GameObject>();
+
     private GameObject activeModel;
+    private GameObject shownModel;
 
     // Start is called before the first frame update
     void Start()
@@ -45,43 +48,96 @@ public class RightControllerActions : MonoBehaviour
 
     public void GetMenuLeft(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        Debug.Log("Dpad left is down");
-
-        int index = listModels.IndexOf(activeModel);
-        GameObject shownModel = (GameObject)listModels[index];
-        shownModel.SetActive(false);
-        if (index == 0)
+        if(listModels.Count > 1)
         {
-            shownModel = (GameObject)listModels[listModels.Count - 1];
-            shownModel.SetActive(true);
-        }
-        else
-        {
-            shownModel = (GameObject)listModels[index - 1];
-            shownModel.SetActive(true);
-        }
+            listChildren(menu);
 
-        activeModel = shownModel;
+            int index = listModels.IndexOf(activeModel);
+            GameObject shownModel = listModels[index];
+            shownModel.SetActive(false);
+            if (index == 0)
+            {
+                shownModel = listModels[listModels.Count - 1];
+                shownModel.SetActive(true);
+            }
+            else
+            {
+                shownModel = listModels[index - 1];
+                shownModel.SetActive(true);
+            }
+
+            activeModel = shownModel;
+        }
     }
 
     public void GetMenuRight(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        Debug.Log("Dpad right is down");
-
-        int index = listModels.IndexOf(activeModel);
-        GameObject shownModel = (GameObject)listModels[index];
-        shownModel.SetActive(false);
-        if (index == listModels.Count - 1)
+        if (listModels.Count > 1)
         {
-            shownModel = (GameObject)listModels[0];
-            shownModel.SetActive(true);
+            listChildren(menu);
+
+            int index = listModels.IndexOf(activeModel);
+            shownModel = listModels[index];
+            shownModel.SetActive(false);
+            if (index == listModels.Count - 1)
+            {
+                shownModel = listModels[0];
+                shownModel.SetActive(true);
+            }
+            else
+            {
+                shownModel = listModels[index + 1];
+                shownModel.SetActive(true);
+            }
+
+            activeModel = shownModel;
         }
-        else
+    }
+
+    public void listChildren(GameObject parentObject)
+    {
+        List<GameObject> listCurentModels = new List<GameObject>();
+        Rigidbody[] arrayCurentModelsRB;
+
+        // Get components, even the inactive children (true)
+        arrayCurentModelsRB = parentObject.GetComponentsInChildren<Rigidbody>(true);
+
+        foreach (Rigidbody body in arrayCurentModelsRB)
         {
-            shownModel = (GameObject)listModels[index + 1];
-            shownModel.SetActive(true);
+            listCurentModels.Add(body.gameObject);
         }
 
-        activeModel = shownModel;
+        bool isAanwezig = false;
+
+        if (listCurentModels.Count != listModels.Count)
+        {
+            for (int i = 0; i < listModels.Count; i++)
+            {
+                for (int x = 0; x < listCurentModels.Count; x++)
+                {
+                    if (listModels[i].name == listCurentModels[x].name)
+                    {
+                        isAanwezig = true;
+                    }
+                }
+
+                if (isAanwezig == false)
+                {
+                    listModels.RemoveAt(i);
+
+                    shownModel = listModels[0];
+                    shownModel.SetActive(true);
+
+                    activeModel = shownModel;
+
+                    Debug.Log(listModels[0]);
+                } else
+                {
+                    isAanwezig = false;
+                }
+            }
+        }
+
+        //return listCurentModels;
     }
 }
