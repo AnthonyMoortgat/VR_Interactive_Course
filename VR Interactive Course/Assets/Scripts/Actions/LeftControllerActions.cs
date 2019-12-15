@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using Valve.VR;
 
@@ -8,9 +9,16 @@ public class LeftControllerActions : MonoBehaviour
     public SteamVR_Input_Sources handType;
     public SteamVR_Behaviour_Pose controllerPose;
     public SteamVR_Action_Boolean grabAction;
+    public SteamVR_Action_Boolean drawAction;
 
     private GameObject collidingObject; // 1
     private GameObject objectInHand; // 2
+
+    //Draw line
+    // private bool drawing = false;
+    private LineRenderer lineRenderer;
+    private GameObject currentLine;
+    private GameObject objectStart;
 
     // Start is called before the first frame update
     void Start()
@@ -18,12 +26,61 @@ public class LeftControllerActions : MonoBehaviour
         //Add listner
         grabAction.AddOnStateUpListener(LoseObject, handType);
         grabAction.AddOnStateDownListener(GrabObject, handType);
+
+        drawAction.AddOnStateDownListener(DrawLine, handType);
+        drawAction.AddOnStateUpListener(StopDrawing, handType);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(drawAction.GetState(handType) == true && objectStart)
+        {
+            // update position of line renderer
+            lineRenderer.SetPosition(1, gameObject.transform.position);
+        }
+    }
+
+    public void DrawLine(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        // Check model is in trigger area
+        // If true => Drawing = true
+        // Generate game object
+        // Generete line renderer and set position to center of model and controller
+
+        if (collidingObject && collidingObject.transform.parent == null)
+        {
+            
+            objectStart = collidingObject;
+
+            currentLine = new GameObject();
+            lineRenderer = currentLine.AddComponent<LineRenderer>();
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            // lineRenderer.widthMultiplier = 0.2f;
+            lineRenderer.startWidth = 0.01f;
+            lineRenderer.endWidth = 0.01f;
+
+            var points = new Vector3[2];
+            points[0] = objectStart.transform.position;
+            points[1] = gameObject.transform.position;
+
+            lineRenderer.SetPositions(points);
+        }
+    }
+
+    public void StopDrawing(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        if (!collidingObject || collidingObject == objectStart)
+        {
+            Destroy(currentLine);
+            currentLine = null;
+            objectStart = null;
+        } else if(collidingObject.transform.parent != null)
+        {
+            Destroy(currentLine);
+            currentLine = null;
+            objectStart = null;
+        }
     }
 
     public void GrabObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
