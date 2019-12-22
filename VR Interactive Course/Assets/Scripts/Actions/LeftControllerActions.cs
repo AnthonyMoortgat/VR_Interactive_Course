@@ -18,7 +18,9 @@ public class LeftControllerActions : MonoBehaviour
     // private bool drawing = false;
     private LineRenderer lineRenderer;
     private GameObject currentLine;
+    private List<Line> listLines = new List<Line>();
     private GameObject objectStart;
+    private List<LineConnection> listConnections = new List<LineConnection>();
 
     // Start is called before the first frame update
     void Start()
@@ -39,15 +41,20 @@ public class LeftControllerActions : MonoBehaviour
             // update position of line renderer
             lineRenderer.SetPosition(1, gameObject.transform.position);
         }
+
+        if(grabAction.GetState(handType) == true && listLines.Count > 0)
+        {
+            //Update lines position
+            foreach(Line line in listLines)
+            {
+                lineRenderer = line.LineObject.GetComponent<LineRenderer>();
+                lineRenderer.SetPosition(line.Position, gameObject.transform.position);
+            }
+        }
     }
 
     public void DrawLine(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        // Check model is in trigger area
-        // If true => Drawing = true
-        // Generate game object
-        // Generete line renderer and set position to center of model and controller
-
         if (collidingObject && collidingObject.transform.parent == null)
         {
             
@@ -70,16 +77,64 @@ public class LeftControllerActions : MonoBehaviour
 
     public void StopDrawing(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        if (!collidingObject || collidingObject == objectStart)
+        if (!collidingObject || collidingObject == objectStart || collidingObject.transform.parent != null)
         {
             Destroy(currentLine);
             currentLine = null;
             objectStart = null;
-        } else if(collidingObject.transform.parent != null)
+        } else
         {
-            Destroy(currentLine);
-            currentLine = null;
-            objectStart = null;
+            // Check if line is a correct connection
+            foreach(Connection connection in Test.myListConnections)
+            {
+                // Check if model is in one of the 2 models
+                if(objectStart == connection.ModelOne)
+                {
+                    Debug.Log(connection.AlreadyPresent);
+
+                    if (collidingObject == connection.ModelTwo && connection.AlreadyPresent == false)
+                    {
+                        Debug.Log("Correct line 1");
+                        // check if line is already actif
+                        // add line
+                        // listConnections.Add(new LineConnection(objectStart, collidingObject, currentLine));
+                        LineConnection lineConnection = new LineConnection(objectStart, collidingObject, currentLine);
+                        listConnections.Add(lineConnection);
+
+                        connection.AlreadyPresent = true;
+
+                        // Change collor of linerenderer
+                        currentLine.GetComponent<LineRenderer>().material.color = Color.green;
+                    } else if (connection.AlreadyPresent)
+                    {
+                        Destroy(currentLine);
+                        currentLine = null;
+                        objectStart = null;
+                    }
+                } else if (objectStart == connection.ModelTwo)
+                {
+                    Debug.Log(connection.AlreadyPresent);
+
+                    if (collidingObject == connection.ModelOne && connection.AlreadyPresent == false)
+                    {
+                        Debug.Log("Correct line 2");
+                        // add line
+                        // listConnections.Add(new LineConnection(objectStart, collidingObject, currentLine));
+                        LineConnection lineConnection = new LineConnection(objectStart, collidingObject, currentLine);
+                        listConnections.Add(lineConnection);
+
+                        connection.AlreadyPresent = true;
+
+                        // Change collor of linerenderer
+                        currentLine.GetComponent<LineRenderer>().material.color = Color.green;
+                    } else if (connection.AlreadyPresent)
+                    {
+                        Destroy(currentLine);
+                        currentLine = null;
+                        objectStart = null;
+                    }
+                }
+            }
         }
     }
 
@@ -87,6 +142,39 @@ public class LeftControllerActions : MonoBehaviour
     {
         if (collidingObject)
         {
+            // Does object have a line ?
+            if (listConnections.Count > 0)
+            {
+                Debug.Log("Has already line in scene");
+
+                foreach (LineConnection lineConnection in listConnections)
+                {
+                    if (collidingObject == lineConnection.StartObject)
+                    {
+                        Debug.Log("Add Line Connection Start");
+
+                        // update line pos[0]
+                        GameObject lineObject = lineConnection.Line;
+                        Line line = new Line(lineObject, 0);
+
+                        listLines.Add(line);
+
+                    }
+                    else if (collidingObject == lineConnection.EndObject)
+                    {
+                        Debug.Log("Add Line Connection End");
+
+                        // update line pos[0]
+                        GameObject lineObject = lineConnection.Line;
+                        Line line = new Line(lineObject, 1);
+
+                        listLines.Add(line);
+                    }
+                }
+
+                Debug.Log(listLines);
+            }
+
             objectInHand = collidingObject;
             collidingObject = null;
 
@@ -120,17 +208,12 @@ public class LeftControllerActions : MonoBehaviour
                 GetComponent<FixedJoint>().connectedBody = null;
                 Destroy(GetComponent<FixedJoint>());
 
-                //Test
                 objectInHand.GetComponent<Rigidbody>().isKinematic = true;
-
-                // 3
-                /*
-                objectInHand.GetComponent<Rigidbody>().velocity = controllerPose.GetVelocity();
-                objectInHand.GetComponent<Rigidbody>().angularVelocity = controllerPose.GetAngularVelocity();
-                */
             }
             // 4
             objectInHand = null;
+            listLines.Clear();
+            // listLines = null;
         }
     }
 

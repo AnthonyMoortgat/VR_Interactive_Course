@@ -35,6 +35,11 @@ public class RightControllerActions : MonoBehaviour
 
         activeModel = mySolarPannel;
 
+        // Test
+        // Add models connection to list
+        Connection connection = new Connection(myBattery, mySolarPannel);
+        Test.myListConnections.Add(connection);
+
         //Add listner
         menuLeft.AddOnStateDownListener(GetMenuLeft, handType);
         menuRight.AddOnStateDownListener(GetMenuRight, handType);
@@ -42,6 +47,11 @@ public class RightControllerActions : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        
+    }
+
+    private void Awake()
     {
         
     }
@@ -129,15 +139,11 @@ public class RightControllerActions : MonoBehaviour
                     shownModel.SetActive(true);
 
                     activeModel = shownModel;
-
-                    Debug.Log(listModels[0]);
                 } else
                 {
                     isAanwezig = false;
                 }
             }
         }
-
-        //return listCurentModels;
     }
 }
