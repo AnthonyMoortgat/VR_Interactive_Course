@@ -107,6 +107,10 @@ public class LeftControllerActions : MonoBehaviour
                         currentLine.GetComponent<LineRenderer>().material.color = Color.green;
                     } else if (connection.AlreadyPresent)
                     {
+                        //Launch error sound
+                        AudioManager.instance.Play("Error");
+                        Debug.Log("Audio error");
+
                         Destroy(currentLine);
                         currentLine = null;
                         objectStart = null;
@@ -129,6 +133,10 @@ public class LeftControllerActions : MonoBehaviour
                         currentLine.GetComponent<LineRenderer>().material.color = Color.green;
                     } else if (connection.AlreadyPresent)
                     {
+                        //Launch error sound
+                        AudioManager.instance.Play("Error");
+                        Debug.Log("Audio error");
+
                         Destroy(currentLine);
                         currentLine = null;
                         objectStart = null;
