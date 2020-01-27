@@ -87,20 +87,22 @@ public class LeftControllerActions : MonoBehaviour
             objectStart = null;
         } else
         {
+            bool lineDrawn = false;
+
             // Check if line is a correct connection
-            foreach(Connection connection in Test.myListConnections)
+            foreach(Connection connection in LineConnectionList.myListConnections)
             {
-                // Check if model is in one of the 2 models
-                if(objectStart == connection.ModelOne)
-                {
-                    Debug.Log(connection.AlreadyPresent);
-
-                    if (collidingObject == connection.ModelTwo && connection.AlreadyPresent == false)
+                // Is this line possible
+                if((objectStart == connection.ModelOne && collidingObject == connection.ModelTwo) || (objectStart == connection.ModelTwo && collidingObject == connection.ModelOne)){
+                    Debug.Log("This line is possible");
+                    
+                    // Does this line already exist
+                    if (!connection.AlreadyPresent)
                     {
-                        Debug.Log("Correct line 1");
-                        // check if line is already actif
-                        // add line
-                        // listConnections.Add(new LineConnection(objectStart, collidingObject, currentLine));
+                        Debug.Log("This line doesn't exist");
+                        lineDrawn = true;
+
+                        // Line is possible and doesn't exist
                         LineConnection lineConnection = new LineConnection(objectStart, collidingObject, currentLine);
                         listConnections.Add(lineConnection);
 
@@ -108,43 +110,19 @@ public class LeftControllerActions : MonoBehaviour
 
                         // Change collor of linerenderer
                         currentLine.GetComponent<LineRenderer>().material.color = Color.green;
-                    } else if (connection.AlreadyPresent)
-                    {
-                        //Launch error sound
-                        AudioManager.instance.Play("Error");
-                        Debug.Log("Audio error");
-
-                        Destroy(currentLine);
-                        currentLine = null;
-                        objectStart = null;
-                    }
-                } else if (objectStart == connection.ModelTwo)
-                {
-                    Debug.Log(connection.AlreadyPresent);
-
-                    if (collidingObject == connection.ModelOne && connection.AlreadyPresent == false)
-                    {
-                        Debug.Log("Correct line 2");
-                        // add line
-                        // listConnections.Add(new LineConnection(objectStart, collidingObject, currentLine));
-                        LineConnection lineConnection = new LineConnection(objectStart, collidingObject, currentLine);
-                        listConnections.Add(lineConnection);
-
-                        connection.AlreadyPresent = true;
-
-                        // Change collor of linerenderer
-                        currentLine.GetComponent<LineRenderer>().material.color = Color.green;
-                    } else if (connection.AlreadyPresent)
-                    {
-                        //Launch error sound
-                        AudioManager.instance.Play("Error");
-                        Debug.Log("Audio error");
-
-                        Destroy(currentLine);
-                        currentLine = null;
-                        objectStart = null;
                     }
                 }
+            }
+
+            if (!lineDrawn)
+            {
+                // Line does not exist or is already drawn
+                // Launch error sound
+                AudioManager.instance.Play("Error");
+
+                Destroy(currentLine);
+                currentLine = null;
+                objectStart = null;
             }
         }
     }
