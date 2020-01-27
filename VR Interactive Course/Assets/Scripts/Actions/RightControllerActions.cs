@@ -11,6 +11,10 @@ public class RightControllerActions : MonoBehaviour
 
     public GameObject sollarPanel;
     public GameObject battery;
+    public GameObject lightBulb;
+    public GameObject powerInverter;
+    public GameObject laptop;
+    public GameObject chargeController;
     public GameObject menu;
 
     // private ArrayList listModels = new ArrayList();
@@ -30,15 +34,46 @@ public class RightControllerActions : MonoBehaviour
         myBattery.transform.parent = menu.transform;
         myBattery.SetActive(false);
 
+        GameObject myLightBulb = Instantiate(lightBulb);
+        myLightBulb.transform.parent = menu.transform;
+        myLightBulb.SetActive(false);
+
+        GameObject myLaptop = Instantiate(laptop);
+        myLaptop.transform.parent = menu.transform;
+        myLaptop.SetActive(false);
+
+        GameObject myChargeController = Instantiate(chargeController);
+        myChargeController.transform.parent = menu.transform;
+        myChargeController.SetActive(false);
+
+        GameObject myPowerInverter = Instantiate(powerInverter);
+        myPowerInverter.transform.parent = menu.transform;
+        myPowerInverter.SetActive(false);
+
         listModels.Add(mySolarPannel);
         listModels.Add(myBattery);
+        listModels.Add(myLightBulb);
+        listModels.Add(myPowerInverter);
+        listModels.Add(myChargeController);
+        listModels.Add(myLaptop);
 
         activeModel = mySolarPannel;
 
-        // Test
         // Add models connection to list
-        Connection connection = new Connection(myBattery, mySolarPannel);
-        Test.myListConnections.Add(connection);
+        Connection connection = new Connection(mySolarPannel, myChargeController);
+        LineConnectionList.myListConnections.Add(connection);
+
+        connection = new Connection(myChargeController, myBattery);
+        LineConnectionList.myListConnections.Add(connection);
+
+        connection = new Connection(myBattery, myLightBulb);
+        LineConnectionList.myListConnections.Add(connection);
+
+        connection = new Connection(myBattery, myPowerInverter);
+        LineConnectionList.myListConnections.Add(connection);
+
+        connection = new Connection(myPowerInverter, myLaptop);
+        LineConnectionList.myListConnections.Add(connection);
 
         //Add listner
         menuLeft.AddOnStateDownListener(GetMenuLeft, handType);

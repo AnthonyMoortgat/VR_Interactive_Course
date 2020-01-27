@@ -77,6 +77,9 @@ public class LeftControllerActions : MonoBehaviour
 
     public void StopDrawing(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
+        // 1) Line must connect to a Object
+        // 2) Object can't be the same object from where the line starts
+        // 3) Object can't be in the menu
         if (!collidingObject || collidingObject == objectStart || collidingObject.transform.parent != null)
         {
             Destroy(currentLine);
@@ -184,6 +187,7 @@ public class LeftControllerActions : MonoBehaviour
             }
 
             objectInHand = collidingObject;
+
             collidingObject = null;
 
             //Test

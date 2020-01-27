@@ -12,6 +12,10 @@ public class ActionSetInput : MonoBehaviour
 
     public GameObject sollarPanel;
     public GameObject battery;
+    public GameObject lightBulb;
+    public GameObject powerInverter;
+    public GameObject laptop;
+    public GameObject chargeController;
     public GameObject menu;
 
     private ArrayList listModels = new ArrayList();
