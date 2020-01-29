@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using Valve.VR;
 
 public class LeftControllerActions : MonoBehaviour
@@ -10,6 +11,7 @@ public class LeftControllerActions : MonoBehaviour
     public SteamVR_Behaviour_Pose controllerPose;
     public SteamVR_Action_Boolean grabAction;
     public SteamVR_Action_Boolean drawAction;
+    public SteamVR_Action_Boolean askInfoAudio;
 
     private GameObject collidingObject; // 1
     private GameObject objectInHand; // 2
@@ -22,6 +24,12 @@ public class LeftControllerActions : MonoBehaviour
     private GameObject objectStart;
     private List<LineConnection> listConnections = new List<LineConnection>();
 
+    private bool isFirstTime = false;
+    private bool isPlayingAudio = false;
+
+    public Canvas canvas;
+    // private Sprite sprite;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +39,8 @@ public class LeftControllerActions : MonoBehaviour
 
         drawAction.AddOnStateDownListener(DrawLine, handType);
         drawAction.AddOnStateUpListener(StopDrawing, handType);
+
+        askInfoAudio.AddOnStateDownListener(AskInfo, handType);
     }
 
     // Update is called once per frame
@@ -129,13 +139,16 @@ public class LeftControllerActions : MonoBehaviour
 
     public void GrabObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
-        if (collidingObject)
+        if(!AudioManager.instance.isSoundPlaying())
+        {
+            Debug.Log("Sound is not playing");
+        }
+
+        if (collidingObject && !AudioManager.instance.isSoundPlaying())
         {
             // Does object have a line ?
             if (listConnections.Count > 0)
             {
-                Debug.Log("Has already line in scene");
-
                 foreach (LineConnection lineConnection in listConnections)
                 {
                     if (collidingObject == lineConnection.StartObject)
@@ -171,6 +184,38 @@ public class LeftControllerActions : MonoBehaviour
             //Test
             objectInHand.GetComponent<Rigidbody>().isKinematic = false;
 
+            if(objectInHand.transform.parent != null)
+            {
+                Debug.Log(objectInHand.name);
+                
+                switch (objectInHand.name)
+                {
+                    case "Solar Panels(Clone)":
+                        StartCoroutine(PlayAudioAndScreen("Zonnepaneel", "Zonnepaneel"));
+                        break;
+
+                    case "Battery(Clone)":
+                        StartCoroutine(PlayAudioAndScreen("Batterij", null));
+                        break;
+
+                    case "Charge Controller(Clone)":
+                        StartCoroutine(PlayAudioAndScreen("ChargeController", null));
+                        break;
+
+                    case "Light Bulb(Clone)":
+                        StartCoroutine(PlayAudioAndScreen("Lamp", null));
+                        break;
+
+                    case "Laptop(Clone)":
+                        StartCoroutine(PlayAudioAndScreen("Computer", null));
+                        break;
+
+                    case "Power Inverter(Clone)":
+                        StartCoroutine(PlayAudioAndScreen("PowerInverter", null));
+                        break;
+                }
+            }
+
             objectInHand.transform.parent = null;
 
             // 2
@@ -205,6 +250,104 @@ public class LeftControllerActions : MonoBehaviour
             listLines.Clear();
             // listLines = null;
         }
+    }
+
+    public void AskInfo(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        /*
+        if (AudioManager.instance.isSoundPlaying())
+        {
+            AudioManager.instance.Stop();
+        } else 
+        */
+        
+        if (collidingObject != null)
+        {
+            switch (collidingObject.name)
+            {
+                case "Solar Panels(Clone)":
+                    StartCoroutine(PlayAudioAndScreen("Zonnepaneel", "Zonnepaneel"));
+                    break;
+
+                case "Battery(Clone)":
+                    StartCoroutine(PlayAudioAndScreen("Batterij", null));
+                    break;
+
+                case "Charge Controller(Clone)":
+                    StartCoroutine(PlayAudioAndScreen("ChargeController", null));
+                    break;
+
+                case "Light Bulb(Clone)":
+                    StartCoroutine(PlayAudioAndScreen("Lamp", null));
+                    break;
+
+                case "Laptop(Clone)":
+                    StartCoroutine(PlayAudioAndScreen("Computer", null));
+                    break;
+
+                case "Power Inverter(Clone)":
+                    StartCoroutine(PlayAudioAndScreen("PowerInverter", null));
+                    break;
+            }
+        }
+    }
+
+    IEnumerator PlayAudioAndScreen(string nameAudio, string nameSprite)
+    {
+        AudioManager.instance.Play(nameAudio);
+
+        float audioLenght = 0;
+        Sprite sprite = null;
+
+        switch (nameAudio)
+        {
+            case "Zonnepaneel":
+                audioLenght = AudioManager.instance.getLenght(nameAudio);
+                sprite = Resources.Load<Sprite>("Images/Silicone");
+                canvas.transform.GetComponent<Image>().sprite = sprite;
+
+                yield return new WaitForSeconds(2);
+
+                sprite = Resources.Load<Sprite>("Images/Zonnepaneel");
+                canvas.transform.GetComponent<Image>().sprite = sprite;
+
+                yield return new WaitForSeconds(2);
+
+                canvas.transform.GetComponent<Image>().sprite = null;
+                break;
+
+            case "PowerInverter":
+                audioLenght = AudioManager.instance.getLenght(nameAudio);
+                sprite = Resources.Load<Sprite>("Images/Voltage");
+                canvas.transform.GetComponent<Image>().sprite = sprite;
+
+                yield return new WaitForSeconds(2);
+
+                sprite = Resources.Load<Sprite>("Images/ACDC");
+                canvas.transform.GetComponent<Image>().sprite = sprite;
+
+                yield return new WaitForSeconds(2);
+
+                sprite = Resources.Load<Sprite>("Images/Sinwave");
+                canvas.transform.GetComponent<Image>().sprite = sprite;
+
+                yield return new WaitForSeconds(2);
+
+                canvas.transform.GetComponent<Image>().sprite = null;
+                break;
+
+            default:
+                audioLenght = AudioManager.instance.getLenght(nameAudio);
+                sprite = Resources.Load<Sprite>("Images/" + nameSprite);
+                canvas.transform.GetComponent<Image>().sprite = sprite;
+
+                yield return new WaitForSeconds(audioLenght);
+
+                canvas.transform.GetComponent<Image>().sprite = null;
+                break;
+        }
+
+        yield return new WaitForSeconds(0);
     }
 
     // Change the interactableObject
