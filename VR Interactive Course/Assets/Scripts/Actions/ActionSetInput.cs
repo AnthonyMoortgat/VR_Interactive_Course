@@ -8,9 +8,14 @@ public class ActionSetInput : MonoBehaviour
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Boolean menuLeft;
     public SteamVR_Action_Boolean menuRight;
+    public SteamVR_Action_Boolean grabAction;
 
     public GameObject sollarPanel;
     public GameObject battery;
+    public GameObject lightBulb;
+    public GameObject powerInverter;
+    public GameObject laptop;
+    public GameObject chargeController;
     public GameObject menu;
 
     private ArrayList listModels = new ArrayList();
@@ -79,5 +84,16 @@ public class ActionSetInput : MonoBehaviour
         }
 
         activeModel = shownModel;
+    }
+
+    public void GrabObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        Debug.Log("Grip is down");
+
+    }
+
+    public void LoseObject(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        Debug.Log("Grip is up");
     }
 }

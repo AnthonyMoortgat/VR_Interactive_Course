@@ -121,6 +121,22 @@ namespace Valve.VR
             }
         }
         
+        public virtual SteamVR_Action_Boolean drawLine
+        {
+            get
+            {
+                return SteamVR_Actions.default_drawLine;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean AskInfoAudio
+        {
+            get
+            {
+                return SteamVR_Actions.default_AskInfoAudio;
+            }
+        }
+        
         public virtual SteamVR_Action_Vibration Haptic
         {
             get
